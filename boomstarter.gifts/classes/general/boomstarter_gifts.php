@@ -8,6 +8,8 @@
 
 namespace classes\general;
 
+// CModule::IncludeModule("sale");
+
 
 class boomstarter_gifts {
     static $MODULE_ID="boomstarter.gifts";
@@ -40,11 +42,26 @@ class boomstarter_gifts {
 
         foreach($gifts as $gift) {
             // create order
-            $order = CreateOrder();
-            $order->setProperty('boomstarter_gift_uuid', $gift->uuid);
+            $order_id = CSaleOrder::Add(array(
+                    // "LID" => "ru",
+                    "PERSON_TYPE_ID" => 1,
+                    "PAYED" => "N",
+                    "CANCELED" => "N",
+                    "STATUS_ID" => "N",
+                    // "PRICE" => 279.32,
+                    // "CURRENCY" => "USD",
+                    // "USER_ID" => IntVal($USER->GetID()),
+                    // "PAY_SYSTEM_ID" => 3,
+                    // "PRICE_DELIVERY" => 11.37,
+                    // "DELIVERY_ID" => 2,
+                    // "DISCOUNT_VALUE" => 1.5,
+                    // "TAX_VALUE" => 0.0,
+                    "USER_DESCRIPTION" => "Подарок через Boomstarter Gifts API",
+                    'BOOMSTARTER_GIFT_UUID' => $gift->uuid
+                ));
+            $order_id = IntVal($order_id)
 
             // send order_id
-            $order_id = order->order_id;
             $gift->order($order_id);
         }
     }
