@@ -5,9 +5,11 @@ Class boomstarter_gifts extends CModule
     var $MODULE_ID = "boomstarter.gifts";
     var $MODULE_VERSION;
     var $MODULE_VERSION_DATE;
-    var $MODULE_NAME;
-    var $MODULE_DESCRIPTION;
+    var $MODULE_NAME = "Boomstarter Gifts";
+    var $MODULE_DESCRIPTION = "Boomstarter Gifts - подарки через Boomstarter Gifts API";
     var $MODULE_CSS;
+    var $PARTNER_NAME = "Boomstarter";
+    var $PARTNER_URI = "http://www.boomstarter.ru/";
     var $SHOP_UUID_OPTION="shop_uuid";
     var $SHOP_TOKEN_OPTION="shop_token";
 
@@ -24,35 +26,25 @@ Class boomstarter_gifts extends CModule
             $this->MODULE_VERSION = $arModuleVersion["VERSION"];
             $this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
         }
-
-        $this->PARTNER_NAME = "Boomstarter";
-        $this->PARTNER_URI = "http://www.boomstarter.ru/";
-        $this->MODULE_NAME = "Boomstarter Gifts";
-        $this->MODULE_DESCRIPTION = "Boomstarter Gifts - подарки через Boomstarter Gifts API";
     }
 
     function InstallFiles($arParams = array())
     {
-        /*
-        CopyDirFiles($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/dv_module/install/components", $_SERVER["DOCUMENT_ROOT"]."/bitrix/components", true, true);
         CopyDirFiles(
-            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/alexey.mycar/install/components/",
-            $_SERVER["DOCUMENT_ROOT"]."/alexey/components",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/classes/general",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/classes/general",
             true, true
         );
-        */
 
         return true;
     }
 
     function UnInstallFiles()
     {
-        /*
-        DeleteDirFilesEx("/bitrix/components/dv");
-        DeleteDirFiles($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/alexey.mycar/install/admin", $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin");
-        DeleteDirFiles($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/alexey.mycar/install/themes/.default/", $_SERVER["DOCUMENT_ROOT"]."/bitrix/themes/.default");//css
-        DeleteDirFilesEx("/bitrix/themes/.default/icons/alexey.mycar/");//icons
-        */
+        DeleteDirFiles(
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID,
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/classes/general"
+        );
         return true;
     }
 

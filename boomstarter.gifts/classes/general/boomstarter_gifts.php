@@ -12,54 +12,94 @@ CModule::IncludeModule("sale");
 CModule::IncludeModule("catalog");
 
 
-class boomstarter_gifts {
+class boomstarter_gifts
+{
     static $MODULE_ID="boomstarter.gifts";
     static $SHOP_UUID_OPTION="shop_uuid";
     static $SHOP_TOKEN_OPTION="shop_token";
 
-    /**
-     * Хэндлер, отслеживающий изменения в инфоблоках
-     * @param $arFields
-     * @return bool
-     */
-    static function onBeforeElementUpdateHandler($arFields){
-        // чтение параметров модуля
-        // $iblock_id = COption::GetOptionString(self::$MODULE_ID, "iblock_id");
-
-        // Активная деятельность
-
-        // Результат
-        return true;
-    }
-
-    public function init()
+    public function process()
     {
         // api load
-        $shop_uuid = COption::GetOptionString($this->MODULE_ID, $this->SHOP_UUID_OPTION, 0);
-        $shop_token = COption::GetOptionString($this->MODULE_ID, $this->SHOP_TOKEN_OPTION, 0);
+        $shop_uuid = $this->getOption($this->SHOP_UUID_OPTION);
+        $shop_token = $this->getOption($this->SHOP_TOKEN_OPTION);
+
         $api = new \Boomstarter\API($shop_uuid, $shop_token);
 
         $gifts = $api->getGiftsPending();
 
+        /* @var $gift \Boomstarter\Gift */
         foreach($gifts as $gift) {
-            $product_id = $gift->product_id;
 
-            $product = $this->getProduct($product_id);
+            // попустить оформленные
+            if ($gift->order_id) {
+                continue;
+            }
 
-            $price = $product['PURCHASING_PRICE'];
-            $currency = $product['PURCHASING_CURRENCY'];
-            $product_name = $product['NAME']; // ?
+            $product = $this->getProduct($gift->product_id);
 
+            $price = $this->getProductPrice($product);
+            $currency = $this->getProductCurrency($product);
+            $product_name = $this->getProductName($product);
+
+            // Пользователь
+            $user = $this->getUserByEmail($gift->owner->email);
+
+            // Если нет - создать
+            if (!$user) {
+                $user_login = $gift->owner->email;
+
+                $user = $this->createUser(
+                    $user_login,
+                    $gift->owner->first_name,
+                    $gift->owner->last_name,
+                    $gift->owner->email,
+                    $gift->phone);
+            }
+
+            // Создать заказ
             $order_id = $this->createOrder($price, $currency, $gift->uuid);
 
-            $this->addToBasket($product_id, $product_name, $price, $currency);
+            // Наполнить корзину
+            $this->clearBasket();
+            $this->addToBasket($gift->product_id, $product_name, $price, $currency);
 
-            CSaleBasket::DeleteAll(CSaleBasket::GetBasketUserID(), False);
+            // Выполнить покупку
 
-            Add2BasketByProductID($PRODUCT_ID = $name_and_price[$i]["id"], $QUANTITY = 1, true);
-
+            // Отправить код заказа
             $gift->order($order_id);
         }
+    }
+
+    private function getOption($key)
+    {
+        return COption::GetOptionString($this->MODULE_ID, $key, 0);
+    }
+
+    private function getProduct($product_id)
+    {
+        $ar_res = CCatalogProduct::GetByID($product_id);
+        return $ar_res;
+    }
+
+    private function getProductPrice($product)
+    {
+        return $product['PURCHASING_PRICE'];
+    }
+
+    private function getProductCurrency($product)
+    {
+        return $product['PURCHASING_CURRENCY'];
+    }
+
+    private function getProductName($product)
+    {
+        return $product['PRODUCT_NAME'];
+    }
+
+    private function clearBasket()
+    {
+        return CSaleBasket::DeleteAll(CSaleBasket::GetBasketUserID(), False);
     }
 
     private function createOrder($price, $currency, $gift_uuid)
@@ -81,13 +121,9 @@ class boomstarter_gifts {
                 "USER_DESCRIPTION" => "Подарок через Boomstarter Gifts API",
                 'BOOMSTARTER_GIFT_UUID' => $gift_uuid
             ));
-        $order_id = IntVal($order_id)
-    }
+        $order_id = IntVal($order_id);
 
-    private function getProduct($product_id)
-    {
-        $ar_res = CCatalogProduct::GetByID($product_id);
-        return $ar_res;
+        return $order_id;
     }
 
     private function addToBasket($product_id, $product_name, $price, $currency)
@@ -110,5 +146,40 @@ class boomstarter_gifts {
         );
 
         CSaleBasket::Add($arFields);
+    }
+
+    private function getUserByEmail($email)
+    {
+        $user = CUser::getByEmail($email);
+
+        return $user;
+    }
+
+    private function createUser($login, $first_name, $last_name, $email)
+    {
+        $password = randString(8); // Генерируем пароль из 8 символов. Его потом надо будет на емыл ему отправить
+
+        $USER = new CUser();
+
+        $new_user_id = $USER->Add(array(
+                'LOGIN' => $login,
+                'NAME' => $first_name,
+                'LAST_NAME' => $last_name,
+                'EMAIL' => $email,
+                'PASSWORD' => $password, // Нах мне два пароля писать - непонятно
+                'CONFIRM_PASSWORD' => $password,
+                'GROUP_ID'=>COption::GetOptionInt('main', 'new_user_registration_def_group'), // Назначем группу по умолчанию
+                'ACTIVE' => "Y",
+                'ADMIN_NOTES'=>"Зарегистрирован автоматически при оформлении заказа"
+            ));
+
+        if ($new_user_id > 0) {
+            $USER->Authorize($new_user_id);
+            $arResult['NEW_USER'] = array(
+                'LOGIN' => $login,
+                'EMAIL' => $email,
+                'PASSWORD' => $password,
+            );
+        }
     }
 }
