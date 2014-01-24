@@ -4,7 +4,6 @@ $module_id = 'boomstarter_gifts';
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$module_id.'/include.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$module_id.'/CModuleOptions.php');
-//IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$module_id.'/options.php');
 
 $showRightsTab = true;
 $arSel = array(
@@ -32,7 +31,8 @@ $arOptions = array(
         'TYPE' => 'STRING',
         'DEFAULT' => '',
         'SORT' => '0',
-        'NOTES' => 'Взять из настройек магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
+        'SIZE' => 80,
+        'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
     ),
     'SHOP_TOKEN' => array(
         'GROUP' => 'MAIN',
@@ -40,7 +40,8 @@ $arOptions = array(
         'TYPE' => 'STRING',
         'DEFAULT' => '',
         'SORT' => '0',
-        'NOTES' => 'Взять из настройек магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
+        'SIZE' => 80,
+        'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
     )
 );
 

@@ -8,6 +8,13 @@
 
 namespace classes\general;
 
+use \CModule;
+use \COption;
+use \CCatalogProduct;
+use \CSaleBasket;
+use \CSaleOrder;
+use \CUser;
+
 CModule::IncludeModule("sale");
 CModule::IncludeModule("catalog");
 
@@ -18,14 +25,9 @@ class boomstarter_gifts
     static $SHOP_UUID_OPTION="SHOP_UUID";
     static $SHOP_TOKEN_OPTION="SHOP_TOKEN";
 
-    public function process()
+    public function cron()
     {
-        // api load
-        $shop_uuid = $this->getOption($this->SHOP_UUID_OPTION);
-        $shop_token = $this->getOption($this->SHOP_TOKEN_OPTION);
-
-        $api = new \Boomstarter\API($shop_uuid, $shop_token);
-
+        $api = $this->getApi();
         $gifts = $api->getGiftsPending();
 
         /* @var $gift \Boomstarter\Gift */
@@ -71,9 +73,20 @@ class boomstarter_gifts
         }
     }
 
+    public static function getApi()
+    {
+        // api load
+        $shop_uuid = static::getOption(static::$SHOP_UUID_OPTION);
+        $shop_token = static::getOption(static::$SHOP_TOKEN_OPTION);
+
+        $api = new \Boomstarter\API($shop_uuid, $shop_token);
+
+        return $api;
+    }
+
     private function getOption($key)
     {
-        return COption::GetOptionString($this->MODULE_ID, $key, 0);
+        return COption::GetOptionString(static::$MODULE_ID, $key, 0);
     }
 
     private function getProduct($product_id)
