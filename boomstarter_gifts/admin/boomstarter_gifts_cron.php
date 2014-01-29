@@ -8,6 +8,6 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/classe
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/classes/general/boomstarter_gifts.php");
 
 $admin = new \classes\general\ControllerBitrix();
-$admin->run();
+$admin->actionCron();
 
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_admin.php");
