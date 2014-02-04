@@ -6,9 +6,11 @@ define("DisableEventsCheck", true);
 
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/prolog_before.php");
 require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/classes/general/API.php");
-require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/classes/general/boomstarter_gifts.php");
+require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/classes/general/ControllerBitrix.php");
 
-$admin = new \classes\general\ControllerBitrix();
+global $APPLICATION;
+
+$admin = new \Boomstarter\Gifts\ControllerBitrix();
 $admin->actionCron();
 
 if($ex = $APPLICATION->GetException()) {
