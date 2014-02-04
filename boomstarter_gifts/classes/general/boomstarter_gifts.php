@@ -12,6 +12,7 @@ if (is_dir('/home/vital/src')) {
     define('DEBUG', TRUE);
 }
 
+use Boomstarter\Exception;
 use \CModule;
 use \COption;
 use \CCatalogProduct;
@@ -204,6 +205,7 @@ class ControllerBitrix extends Controller
             array("id"=>"PRICE", "content"=>"Цена", "sort"=>"price", "default"=>true),
             array("id"=>"PRODUCT_ID", "content"=>"PRODUCT_ID", "sort"=>"product_id", "default"=>true),
             array("id"=>"ORDER", "content"=>"Заказ", "sort"=>"ORDER", "default"=>true),
+            array("id"=>"STATUS", "content"=>"Статус", "sort"=>"delivery_state", "default"=>true),
             array("id"=>"ACTION", "content"=>"", "default"=>true),
         );
 
@@ -237,6 +239,7 @@ class ControllerBitrix extends Controller
             $row->AddViewField("PRICE", number_format($gift->pledged, 0, '.', ' '));
             $row->AddField("PRODUCT_ID", $gift->product_id);
             $row->AddField("ORDER", $gift->order_id);
+            $row->AddField("STATUS", $gift->delivery_state);
             $row->AddViewField("ACTION", '<a href="'.$APPLICATION->GetCurPageParam('action=SetStateDelivery&uuid=stub'.$gift->uuid, array("id", "d")).'" class="adm-btn">Delivery</a>');
         }
 
@@ -256,21 +259,22 @@ class ControllerBitrix extends Controller
         $uuid = $_GET['uuid'];
 
         try {
-            $api = \classes\general\boomstarter_gifts::getApi();
+            $api = $this->getApi();
             $api->setGiftStateDelivery($uuid);
+            ShowMessage("Статус обновлен.");
+            $this->actionList();
         } catch (\Boomstarter\Exception $ex) {
             $e = $APPLICATION->GetException();
             $this->lAdmin->AddUpdateError(($e ? $e->getString() : "Gift delivery error"), $uuid);
             $this->lAdmin->DisplayList();
         }
-
-        // $this->lAdmin->ActionRedirect($APPLICATION->GetCurPage());
     }
 
     public function actionCron()
     {
         $api = $this->getApi();
         $gifts = $api->getGiftsPending();
+        $log_messages = array();
 
         /* @var $gift \Boomstarter\Gift */
         foreach($gifts as $gift) {
@@ -283,26 +287,49 @@ class ControllerBitrix extends Controller
             // продукт
             $product = $this->getProduct($gift->product_id);
 
-            $price = $this->getProductPrice($product);
+             $price = $this->getProductPrice($product);
             $currency = $this->getProductCurrency($product);
             $product_name = $this->getProductName($product);
 
             // Пользователь
-            $user = $this->getBoomstarterUser();
-
-            // Создать заказ
-            $order_id = $this->createOrder($price, $currency, $gift->uuid, $user);
+            $this->getBoomstarterUser();
 
             // Наполнить корзину
             $this->clearBasket();
             $this->addToBasket($gift->product_id, $product_name, $price, $currency);
 
+            // Создать заказ
+            $order_id = $this->createOrder(
+                $price,
+                $currency,
+                $gift->uuid,
+                "Клиент: {$gift->owner->first_name} {$gift->owner->last_name}, тел. {$gift->owner->phone}");
+
             // Выполнить покупку
-            $this->orderBasket($order_id, $user);
+            $this->orderBasket($order_id);
 
             // Отправить код заказа
-            $gift->order($order_id);
+            try {
+                $gift->order($order_id);
+                $success = TRUE;
+            } catch (Exception $e) {
+                $success = FALSE;
+            }
+
+            // log
+            $log_messages[] = array(
+                    'date' => date('Y-m-d H:i:s'),
+                    'action' => "order",
+                    'uuid' => $gift->uuid,
+                    'order_id' => $order_id,
+                    'product_id' => $gift->product_id,
+                    'product_name' => $gift->name,
+                    'success' => $success,
+                );
         }
+
+        // show log
+        echo json_encode($log_messages);
     }
 
     private function getProduct($product_id)
@@ -314,12 +341,13 @@ class ControllerBitrix extends Controller
 
     private function getProductPrice($product)
     {
-        return $product['PROPERTIES']['PRICE'];
+        // return \CPrice::GetBasePrice($product['ID']);
+        return $product['PROPERTIES']['PRICE']['VALUE'];
     }
 
     private function getProductCurrency($product)
     {
-        return 'RUB';
+        return 'RUB'; // FIXME repalce it stub
         return $product['PROPERTIES']['PRICECURRENCY']['VALUE'];
     }
 
@@ -330,21 +358,22 @@ class ControllerBitrix extends Controller
 
     private function clearBasket()
     {
-        return CSaleBasket::DeleteAll(CSaleBasket::GetBasketUserID(), False);
+        return CSaleBasket::DeleteAll();
     }
 
-    private function createOrder($price, $currency, $gift_uuid, $user)
+    private function createOrder($price, $currency, $gift_uuid, $description='')
     {
+        global $USER;
+
         $order_id = CSaleOrder::Add(array(
                 "LID" => SITE_ID,
                 "PERSON_TYPE_ID" => 1,
                 "PRICE" => $price,
                 "CURRENCY" => $currency,
-                "USER_ID" => IntVal($user['ID']),
-                "PAY_SYSTEM_ID" => $user["PAY_SYSTEM_ID"],
-                // "DELIVERY_ID" => 2,
-                "USER_DESCRIPTION" => "Подарок через Boomstarter Gifts API",
-                //'BOOMSTARTER_GIFT_UUID' => $gift_uuid
+                "USER_ID" => $USER->GetID(),
+                //"USER_DESCRIPTION" => $description,
+                //"ADDITIONAL_INFO" => $description,
+                "COMMENTS" => $description,
             ));
 
         $order_id = IntVal($order_id);
@@ -354,24 +383,21 @@ class ControllerBitrix extends Controller
 
     private function addToBasket($product_id, $product_name, $price, $currency)
     {
-        $site = ''; // ? LID - сайт, на котором сделана покупка (обязательное поле);
-
         $arFields = array(
             "PRODUCT_ID" => $product_id,
-            "PRODUCT_PRICE_ID" => 0,
             "PRICE" => $price,
             "CURRENCY" => $currency,
             "QUANTITY" => 1,
-            "LID" => $site,
-            "DELAY" => "Y",
+            "LID" => SITE_ID,
+            "DELAY" => "N",
             "CAN_BUY" => "Y",
             "NAME" => $product_name,
             "MODULE" => $this->MODULE_ID,
             "NOTES" => "Подарок через Boomstarter Gifts API",
-            // "DETAIL_PAGE_URL" => "/".LANG."/detail.php?ID=".$product_id
+            "IGNORE_CALLBACK_FUNC" => "Y",
         );
 
-        CSaleBasket::Add($arFields);
+        $result = CSaleBasket::Add($arFields);
     }
 
     private function getBoomstarterUser()
@@ -379,12 +405,37 @@ class ControllerBitrix extends Controller
         $dbResult = CUser::GetByLogin($this->BOOMSTARTER_USER_LOGIN); // TODO login via options
         $user = $dbResult->Fetch();
 
+        // Пользователь
         // Если нет - создать
         if (!$user) {
             $user = $this->createUser($this->BOOMSTARTER_USER_LOGIN, $this->BOOMSTARTER_USER_EMAIL);
         }
 
+        // Покупатель
+        $user_id = $user['ID'];
+
+        // авторизация
+        $result = CUser::Authorize($user_id);
+
         return $user;
+
+        // получаем FUSER_ID, если покупатель для данного пользователя существует
+        $FUSER_ID = \CSaleUser::GetList(array('USER_ID' => $user_id));
+
+        //если покупателя нет - создаем его
+        if (!$FUSER_ID['ID']) {
+            $FUSER_ID['ID'] = \CSaleUser::_Add(array("USER_ID" => $user_id)); //обратите внимание на нижнее подчеркивание перед Add
+        }
+
+        //если не получается создать покупателя - то тут уж ничего не поделаешь
+        if (!$FUSER_ID['ID']) {
+            die("Error while creating SaleUser");
+        }
+
+        $sale_user_id = intval($FUSER_ID['ID']);
+        // теперь переменную $FUSER_ID можно использовать для добавления товаров в корзину пользователя с $userId.
+
+        return $sale_user_id;
     }
 
     private function createUser($login, $email)
@@ -403,26 +454,17 @@ class ControllerBitrix extends Controller
                 'GROUP_ID'=>COption::GetOptionInt('main', 'new_user_registration_def_group'), // Назначем группу по умолчанию
                 'ACTIVE' => "Y",
                 // 'PERSON_TYPE_ID' => 1,
-                'ADMIN_NOTES'=>"Зарегистрирован автоматически при оформлении заказа"
+                'ADMIN_NOTES'=>"Зарегистрирован автоматически при оформлении заказа",
             ));
-
-        /*
-        $arFields = array(
-            "NAME" => "Boomstarter",
-            "USER_ID" => $user_id,
-            "PERSON_TYPE_ID" => 2
-        );
-        $USER_PROPS_ID = CSaleOrderUserProps::Add($arFields);
-        */
 
         $ar_user = $user->GetById($user_id)->Fetch();
 
         return $ar_user;
     }
 
-    private function orderBasket($order_id, $user)
+    private function orderBasket($order_id)
     {
-        CSaleBasket::OrderBasket($order_id, $user["ID"]);
+        CSaleBasket::OrderBasket($order_id);
     }
 
     protected function getCMS()

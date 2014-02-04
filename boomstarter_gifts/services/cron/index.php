@@ -11,4 +11,8 @@ require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/classe
 $admin = new \classes\general\ControllerBitrix();
 $admin->actionCron();
 
+if($ex = $APPLICATION->GetException()) {
+    echo "<pre>".$ex->GetString()."</pre>";
+}
+
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/main/include/epilog_after.php");
