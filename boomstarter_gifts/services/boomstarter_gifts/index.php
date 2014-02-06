@@ -1,4 +1,4 @@
-<?
+<?php
 define("NO_AGENT_CHECK", true);
 define("NO_AGENT_STATISTIC", true);
 define("NOT_CHECK_PERMISSIONS", true);
@@ -13,7 +13,7 @@ global $APPLICATION;
 $admin = new \Boomstarter\Gifts\ControllerBitrix();
 $admin->actionCron();
 
-if($ex = $APPLICATION->GetException()) {
+if ($ex = $APPLICATION->GetException()) {
     echo "<pre>".$ex->GetString()."</pre>";
 }
 

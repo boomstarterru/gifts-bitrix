@@ -2,6 +2,11 @@
 
 Class boomstarter_gifts extends CModule
 {
+    const OPTION_SHOP_UUID = "SHOP_UUID";
+    const OPTION_SHOP_TOKEN = "SHOP_TOKEN";
+    const OPTION_GIFTS_USER_NAME = "GIFTS_USER_NAME";
+    const OPTION_GIFTS_USER_EMAIL = "GIFTS_USER_EMAIL";
+
     var $MODULE_ID = "boomstarter_gifts";
     var $MODULE_VERSION;
     var $MODULE_VERSION_DATE;
@@ -9,9 +14,6 @@ Class boomstarter_gifts extends CModule
     var $MODULE_DESCRIPTION = "Подарки через Boomstarter Gifts API";
     var $MODULE_CSS;
     var $PARTNER_NAME = "Boomstarter";
-    var $PARTNER_URI = "http://www.boomstarter.ru/";
-    var $SHOP_UUID_OPTION="shop_uuid";
-    var $SHOP_TOKEN_OPTION="shop_token";
 
     function boomstarter_gifts()
     {
@@ -19,6 +21,7 @@ Class boomstarter_gifts extends CModule
 
         $path = str_replace("\\", "/", __FILE__);
         $path = substr($path, 0, strlen($path) - strlen("/index.php"));
+
         include($path."/version.php");
 
         if (is_array($arModuleVersion) && array_key_exists("VERSION", $arModuleVersion))
@@ -30,9 +33,17 @@ Class boomstarter_gifts extends CModule
 
     function InstallFiles($arParams = array())
     {
+        // admin
         CopyDirFiles(
-            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/classes/general",
-            $_SERVER["DOCUMENT_ROOT"]."/bitrix/classes/general",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/install/admin",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin",
+            true, true
+        );
+
+        // services
+        CopyDirFiles(
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/install/services",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/services",
             true, true
         );
 
@@ -41,10 +52,18 @@ Class boomstarter_gifts extends CModule
 
     function UnInstallFiles()
     {
+        // admin
         DeleteDirFiles(
-            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID,
-            $_SERVER["DOCUMENT_ROOT"]."/bitrix/classes/general"
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/install/admin",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin"
         );
+
+        // services
+        DeleteDirFiles(
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/install/services",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/services"
+        );
+
         return true;
     }
 
@@ -58,8 +77,12 @@ Class boomstarter_gifts extends CModule
 
         $APPLICATION->IncludeAdminFile("Установка модуля " . $this->MODULE_ID, $DOCUMENT_ROOT."/bitrix/modules/" . $this->MODULE_ID . "/install/step.php");
 
-        COption::SetOptionString($this->MODULE_ID, $this->SHOP_UUID_OPTION, "");
-        COption::SetOptionString($this->MODULE_ID, $this->SHOP_TOKEN_OPTION, "");
+        // default options
+        include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/default_options.php");
+
+        foreach($boomstarter_gifts_default_option as $key=>$value) {
+            COption::SetOptionString($this->MODULE_ID, $key, $value);
+        }
 
         return true;
     }
@@ -68,10 +91,15 @@ Class boomstarter_gifts extends CModule
     {
         global $DOCUMENT_ROOT, $APPLICATION;
 
-        $this->UnInstallFiles();
+        // remove options
+        include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/default_options.php");
 
-        COption::RemoveOption($this->MODULE_ID, $this->SHOP_UUID_OPTION);
-        COption::RemoveOption($this->MODULE_ID, $this->SHOP_TOKEN_OPTION);
+        foreach($boomstarter_gifts_default_option as $key=>$value) {
+            COption::RemoveOption($this->MODULE_ID, $key);
+        }
+
+        // remove files
+        $this->UnInstallFiles();
 
         UnRegisterModule($this->MODULE_ID);
 

@@ -2,7 +2,6 @@
 
 namespace Boomstarter\Gifts;
 
-
 use Boomstarter\Exception;
 
 class CMS
@@ -114,3 +113,4 @@ class CMS
         throw new Exception("Not Implemented");
     }
 }
+

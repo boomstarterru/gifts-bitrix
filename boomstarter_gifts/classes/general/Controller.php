@@ -2,16 +2,12 @@
 
 namespace Boomstarter\Gifts;
 
-use Boomstarter\Exception;
-
 require_once('API.php');
-require_once('CMS.php');
+
+use Boomstarter\Exception;
 
 class Controller
 {
-    protected $SHOP_UUID_OPTION = "SHOP_UUID";
-    protected $SHOP_TOKEN_OPTION = "SHOP_TOKEN";
-
     public function actionList()
     {
         throw new Exception("Not Implemented");
@@ -55,8 +51,8 @@ class Controller
     public function getApi()
     {
         // api load
-        $shop_uuid = $this->getCMS()->getOption($this->SHOP_UUID_OPTION);
-        $shop_token = $this->getCMS()->getOption($this->SHOP_TOKEN_OPTION);
+        $shop_uuid = $this->getCMS()->getOption("SHOP_UUID"); // FIXME use option constant
+        $shop_token = $this->getCMS()->getOption("SHOP_TOKEN"); // FIXME use option constant
 
         $api = new \Boomstarter\API($shop_uuid, $shop_token);
 

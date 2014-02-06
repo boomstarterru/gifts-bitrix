@@ -42,6 +42,24 @@ $arOptions = array(
         'SORT' => '0',
         'SIZE' => 80,
         'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
+    ),
+    'GIFTS_USER_NAME' => array(
+        'GROUP' => 'MAIN',
+        'TITLE' => 'Логин пользователя',
+        'TYPE' => 'STRING',
+        'DEFAULT' => 'Boomstarter',
+        'SORT' => '3',
+        'SIZE' => 80,
+        'NOTES' => 'Все подарки оформляются на одного пользователя. Здесь его логин.'
+    ),
+    'GIFTS_USER_EMAIL' => array(
+        'GROUP' => 'MAIN',
+        'TITLE' => 'Еmail пользователя',
+        'TYPE' => 'STRING',
+        'DEFAULT' => 'api@boomstarter.ru',
+        'SORT' => '4',
+        'SIZE' => 80,
+        'NOTES' => 'Все подарки оформляются на одного пользователя. Здесь его email.'
     )
 );
 

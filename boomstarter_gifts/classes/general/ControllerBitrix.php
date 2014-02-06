@@ -33,11 +33,15 @@ if (!CModule::IncludeModule('iblock')) {
     die('{"error":"Module \"iblock\" not installed"}');
 }
 
+if (!\CModule::IncludeModule('boomstarter_gifts')) {
+    die('{"error":"Module \"boomstarter_gifts\" not installed"}');
+}
+
+CModule::IncludeModule('currency');
+
 class ControllerBitrix extends Controller
 {
     var $lAdmin = NULL;
-    private $BOOMSTARTER_USER_LOGIN="boomstarter"; // TODO via options
-    private $BOOMSTARTER_USER_EMAIL="api@boomstarter.ru"; // TODO via options
 
     function __construct()
     {

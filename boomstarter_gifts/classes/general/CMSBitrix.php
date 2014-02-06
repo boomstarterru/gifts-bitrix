@@ -20,25 +20,31 @@ if (!\CModule::IncludeModule('iblock')) {
     die('{"error":"Module \"iblock\" not installed"}');
 }
 
+if (!\CModule::IncludeModule('boomstarter_gifts')) {
+    die('{"error":"Module \"boomstarter_gifts\" not installed"}');
+}
+
 use \COption;
 use \CCatalogProduct;
 use \CSaleBasket;
 use \CSaleOrder;
+use \CSaleUser;
+use \CCurrency;
 use \CUser;
 use \CAdminSorting;
 use \CAdminList;
 use \CIBlockElement;
 use \CFile;
 use \CSaleOrderUserProps;
+use \boomstarter_gifts;
 
 
 class CMSBitrix extends CMS
 {
-    protected $MODULE_ID="boomstarter_gifts";
-
     public function getOption($key)
     {
-        return COption::GetOptionString($this->MODULE_ID, $key, 0);
+        $module = new boomstarter_gifts();
+        return COption::GetOptionString($module->MODULE_ID, $key, 0);
     }
 
     public function getProduct($product_id)
@@ -56,8 +62,13 @@ class CMSBitrix extends CMS
 
     public function getProductCurrency($product)
     {
-        return 'RUB'; // FIXME repalce it stub
-        return $product['PROPERTIES']['PRICECURRENCY']['VALUE'];
+        if (class_exists('CCurrency')) {
+            $currency = CCurrency::GetBaseCurrency();
+        } else {
+            $currency = 'RUB';
+        }
+
+        return $currency;
     }
 
     public function getProductName($product)
@@ -92,6 +103,8 @@ class CMSBitrix extends CMS
 
     public function addToBasket($product_id, $product_name, $price, $currency)
     {
+        $module = new boomstarter_gifts();
+
         $arFields = array(
             "PRODUCT_ID" => $product_id,
             "PRICE" => $price,
@@ -101,7 +114,7 @@ class CMSBitrix extends CMS
             "DELAY" => "N",
             "CAN_BUY" => "Y",
             "NAME" => $product_name,
-            "MODULE" => $this->MODULE_ID,
+            "MODULE" => $module->MODULE_ID,
             "NOTES" => "Подарок через Boomstarter Gifts API",
             "IGNORE_CALLBACK_FUNC" => "Y",
         );
@@ -111,13 +124,16 @@ class CMSBitrix extends CMS
 
     public function getBoomstarterUser()
     {
-        $dbResult = CUser::GetByLogin($this->BOOMSTARTER_USER_LOGIN); // TODO login via options
+        $boomstarter_login = $this->getOption(boomstarter_gifts::OPTION_GIFTS_USER_NAME);
+        $boomstarter_email = $this->getOption(boomstarter_gifts::OPTION_GIFTS_USER_EMAIL);
+
+        $dbResult = CUser::GetByLogin($boomstarter_login);
         $user = $dbResult->Fetch();
 
         // Пользователь
         // Если нет - создать
         if (!$user) {
-            $user = $this->createUser($this->BOOMSTARTER_USER_LOGIN, $this->BOOMSTARTER_USER_EMAIL);
+            $user = $this->createUser($boomstarter_login, $boomstarter_email);
         }
 
         // Покупатель
@@ -129,11 +145,11 @@ class CMSBitrix extends CMS
         return $user;
 
         // получаем FUSER_ID, если покупатель для данного пользователя существует
-        $FUSER_ID = \CSaleUser::GetList(array('USER_ID' => $user_id));
+        $FUSER_ID = CSaleUser::GetList(array('USER_ID' => $user_id));
 
         //если покупателя нет - создаем его
         if (!$FUSER_ID['ID']) {
-            $FUSER_ID['ID'] = \CSaleUser::_Add(array("USER_ID" => $user_id)); //обратите внимание на нижнее подчеркивание перед Add
+            $FUSER_ID['ID'] = CSaleUser::_Add(array("USER_ID" => $user_id)); //обратите внимание на нижнее подчеркивание перед Add
         }
 
         //если не получается создать покупателя - то тут уж ничего не поделаешь
