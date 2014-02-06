@@ -1,0 +1,41 @@
+{
+    "gifts": [ {
+        "pledged": 690.0,
+        "product_id":25330,
+        "location": {
+            "country": {
+                "id":20,
+                "name":"Россия"
+            },
+            "city": {
+                "id":49849,
+                "name":"Москва",
+                "slug":"moscow-ru"
+            }
+        },
+        "owner": {
+            "email":"boomstarter@boomstarter.ru",
+            "phone":"79853867016",
+            "first_name":"Ivan",
+            "last_name":"Ivanov"
+        },
+        "payout_id":null,
+        "state":"success_funded",
+        "zipcode":null,
+        "comments":"",
+        "uuid":"5b6a38b7-b555-43e6-8b00-45ea924b283d",
+        "name":"Чехол ArtWizz SeeJacket Alu Anthrazit для iPhone4/4S (AZ515AT)",
+        "pledged_cents":69000,
+        "delivery_state":"none",
+        "region":null,
+        "district":null,
+        "city":null,
+        "street":"awdawd",
+        "house":null,
+        "building":null,
+        "construction":null,
+        "apartment":null,
+        "order_id":null
+    } ],
+    "_metadata":{ "total_count":1 }    
+}
