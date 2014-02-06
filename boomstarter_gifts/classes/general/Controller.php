@@ -51,8 +51,8 @@ class Controller
     public function getApi()
     {
         // api load
-        $shop_uuid = $this->getCMS()->getOption("SHOP_UUID"); // FIXME use option constant
-        $shop_token = $this->getCMS()->getOption("SHOP_TOKEN"); // FIXME use option constant
+        $shop_uuid = $this->getCMS()->getShopUuid();
+        $shop_token = $this->getCMS()->getShopToken();
 
         $api = new \Boomstarter\API($shop_uuid, $shop_token);
 

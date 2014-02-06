@@ -112,5 +112,21 @@ class CMS
     {
         throw new Exception("Not Implemented");
     }
+
+    /**
+     * @return string
+     */
+    public function getShopUuid()
+    {
+        throw new Exception("Not Implemented");
+    }
+
+    /**
+     * @return string
+     */
+    public function getShopToken()
+    {
+        throw new Exception("Not Implemented");
+    }
 }
 

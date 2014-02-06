@@ -191,4 +191,14 @@ class CMSBitrix extends CMS
     {
         CSaleBasket::OrderBasket($order_id);
     }
+
+    public function getShopUuid()
+    {
+        return $this->getOption(boomstarter_gifts::OPTION_SHOP_UUID);
+    }
+
+    public function getShopToken()
+    {
+        return $this->getOption(boomstarter_gifts::OPTION_SHOP_TOKEN);
+    }
 }
