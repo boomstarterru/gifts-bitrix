@@ -9,7 +9,9 @@ if (is_dir('/home/vital/src')) {
     define('DEBUG', TRUE);
 }
 
+use Boomstarter\Gift;
 use \CModule;
+use \CMain;
 use \COption;
 use \CCatalogProduct;
 use \CSaleBasket;
@@ -118,8 +120,7 @@ class ControllerBitrix extends Controller
             $products[$row["ID"]] = $row;
         }
 
-        foreach($gifts as $gift)
-        {
+        foreach($gifts as $gift) {
             $row =& $this->lAdmin->AddRow($gift->uuid, array(
                     'product_id' => $gift->product_id,
                     'name' => $gift->name,
@@ -131,8 +132,48 @@ class ControllerBitrix extends Controller
             $row->AddViewField("PRICE", number_format($gift->pledged, 0, '.', ' '));
             $row->AddField("PRODUCT_ID", $gift->product_id);
             $row->AddField("ORDER", $gift->order_id);
-            $row->AddField("STATUS", $gift->delivery_state);
-            $row->AddViewField("ACTION", '<a href="'.$APPLICATION->GetCurPageParam('action=SetStateDelivery&uuid=stub'.$gift->uuid, array("id", "d")).'" class="adm-btn">Delivery</a>');
+
+            $states = array(
+                Gift::STATE_ACCEPT => 'Принят',
+                Gift::STATE_SHIP => 'В доставке',
+                Gift::STATE_DELIVERY => 'Доставлен',
+            );
+            $state_i18n = $gift->delivery_state ? $states[$gift->delivery_state] : $gift->delivery_state;
+            $row->AddField("STATUS", $state_i18n);
+
+            $href_accept = '#';
+            $href_ship = '#';
+            $href_delivery = '#';
+            $class_accept = "adm-btn adm-btn-disabled";
+            $class_ship = "adm-btn adm-btn-disabled";
+            $class_delivery = "adm-btn adm-btn-disabled";
+            $next_state = $gift->getNextState();
+
+            switch ($next_state) {
+                case Gift::STATE_ACCEPT:
+                    $href_accept = $APPLICATION->GetCurPageParam('action=SetStateAccept&uuid='.$gift->uuid, array("id", "d", "uuid", "action"));
+                    $class_accept = "adm-btn adm-btn-green";
+                    break;
+
+                case Gift::STATE_SHIP:
+                    $href_ship = $APPLICATION->GetCurPageParam('action=SetStateShip&uuid='.$gift->uuid, array("id", "d", "uuid", "action"));
+                    $class_ship = "adm-btn adm-btn-green";
+                    break;
+
+                case Gift::STATE_DELIVERY:
+                    $href_delivery = $APPLICATION->GetCurPageParam('action=SetStateDelivery&uuid='.$gift->uuid, array("id", "d", "uuid", "action"));
+                    $class_delivery = "adm-btn adm-btn-green";
+                    break;
+
+                default:
+                    break;
+            }
+
+            $row->AddViewField("ACTION",
+                '<a href="'.$href_accept.'" class="'.$class_accept.'">Принят</a>'.
+                '<a href="'.$href_ship.'" class="'.$class_ship.'">Отправлен</a>'.
+                '<a href="'.$href_delivery.'" class="'.$class_delivery.'">Доставлен</a>'
+            );
         }
 
         $this->lAdmin->CheckListMode();
@@ -144,6 +185,42 @@ class ControllerBitrix extends Controller
         $this->lAdmin->DisplayList();
     }
 
+    public function actionSetStateAccept()
+    {
+        global $APPLICATION;
+
+        $uuid = $_GET['uuid'];
+
+        try {
+            $api = $this->getApi();
+            $api->setGiftStateAccept($uuid);
+            $redirect = $APPLICATION->GetCurPageParam('', array("id", "d", "uuid", "action"));
+            LocalRedirect($redirect);
+        } catch (\Boomstarter\Exception $ex) {
+            $e = $APPLICATION->GetException();
+            $this->lAdmin->AddUpdateError(($e ? $e->getString() : "Gift delivery error"), $uuid);
+            $this->lAdmin->DisplayList();
+        }
+    }
+
+    public function actionSetStateShip()
+    {
+        global $APPLICATION;
+
+        $uuid = $_GET['uuid'];
+
+        try {
+            $api = $this->getApi();
+            $api->setGiftStateShip($uuid);
+            $redirect = $APPLICATION->GetCurPageParam('', array("id", "d", "uuid", "action"));
+            LocalRedirect($redirect);
+        } catch (\Boomstarter\Exception $ex) {
+            $e = $APPLICATION->GetException();
+            $this->lAdmin->AddUpdateError(($e ? $e->getString() : "Gift delivery error"), $uuid);
+            $this->lAdmin->DisplayList();
+        }
+    }
+
     public function actionSetStateDelivery()
     {
         global $APPLICATION;
@@ -153,8 +230,8 @@ class ControllerBitrix extends Controller
         try {
             $api = $this->getApi();
             $api->setGiftStateDelivery($uuid);
-            ShowMessage("Статус обновлен.");
-            $this->actionList();
+            $redirect = $APPLICATION->GetCurPageParam('', array("id", "d", "uuid", "action"));
+            LocalRedirect($redirect);
         } catch (\Boomstarter\Exception $ex) {
             $e = $APPLICATION->GetException();
             $this->lAdmin->AddUpdateError(($e ? $e->getString() : "Gift delivery error"), $uuid);

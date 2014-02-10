@@ -56,10 +56,6 @@ class Controller
 
         $api = new \Boomstarter\API($shop_uuid, $shop_token);
 
-        if (defined('DEBUG') && DEBUG) {
-            $api->setApiUrl('http://localhost:8000/api/v1.1/partners');
-        }
-
         return $api;
     }
 

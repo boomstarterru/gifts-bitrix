@@ -23,7 +23,6 @@ class MiniServer
         }
 
         // output
-        header('Content-Type: application/json');
         echo $output;
     }
 
@@ -38,7 +37,7 @@ class MiniServer
         $base = '/api/v1.1/partners/';
 
         if (!stristr($path, $base)) {
-            throw new Exception('Unsupported base: '.$base);
+            throw new Exception('Unsupported base: '.$path);
         }
 
         $rest = substr($path, strlen($base));
@@ -92,8 +91,8 @@ abstract class API
         $this->args = explode('/', rtrim($request, '/'));
         $this->endpoint = array_shift($this->args);
 
-        if (array_key_exists(0, $this->args) && !is_numeric($this->args[0])) {
-            $this->verb = array_shift($this->args);
+        if ($this->args && method_exists($this, $this->args[count($this->args)-1])) {
+            $this->verb = array_pop($this->args);
         }
 
         $this->method = $_SERVER['REQUEST_METHOD'];
@@ -112,6 +111,7 @@ abstract class API
             case 'DELETE':
             case 'POST':
                 $this->request = $this->_cleanInputs($_POST);
+                $this->file = file_get_contents("php://input");
                 break;
             case 'GET':
                 $this->request = $this->_cleanInputs($_GET);
@@ -128,7 +128,7 @@ abstract class API
 
     public function processAPI()
     {
-        if ((int)method_exists($this, $this->endpoint) > 0) {
+        if (method_exists($this, $this->endpoint)) {
             return $this->_response($this->{$this->endpoint}($this->args));
         }
         return $this->_response("No Endpoint: ". $this->endpoint, 404);
@@ -171,59 +171,79 @@ class MiniAPI extends API
     protected function gifts($args)
     {
         if ($this->verb) {
-            switch ($this->verb) {
-                case 'pending':
-                    $store = new StoreJSON(STORE_FILE);
-                    $gifts = $store->load();
-
-                    $package = array(
-                        'gifts' => $gifts,
-                        '_metadata' => array(
-                            'total_count' => count($gifts)
-                        ),
-                    );
-
-                    echo(json_encode($package));
-                    break;
-
-                case 'shipping':
-                    break;
-
-                case 'delivered':
-                    break;
-            }
-        } else {
-            $id = $args[0];
-
-            switch ($this->verb) {
-                case 'order':
-                    $store = new StoreJSON(STORE_FILE);
-                    $gifts = $store->load();
-
-                    // find gift
-                    foreach($gifts as $gift) {
-                        if ($gift->uuid != $id) {
-                            continue;
-                        }
-
-                        $package = $gift;
-                        echo(json_encode($package));
-                        break;
-                    }
-                    break;
-
-                case 'delivery_state':
-                    break;
-
-                case 'schedule':
-                    break;
-            }
+            return $this->{$this->verb}($this->args);
         }
+    }
 
+    protected function pending($args)
+    {
+        $store = new StoreJSON(STORE_FILE);
+        $gifts = $store->load();
 
-        if ($this->method != 'GET') {
-            return "Only accepts GET requests";
+        $package = array(
+            'gifts' => $gifts,
+            '_metadata' => array(
+                'total_count' => count($gifts)
+            ),
+        );
+
+        return $package;
+    }
+
+    protected function order($args)
+    {
+        $id = $args[0];
+        $order_id = json_decode($this->file, TRUE)['order_id'];
+
+        $store = new StoreJSON(STORE_FILE);
+        $gifts = $store->load();
+
+        // find gift
+        foreach($gifts as &$gift) {
+            if ($gift['uuid'] != $id) {
+                continue;
+            }
+
+            $gift['order_id'] = $order_id;
+
+            $store->save($gifts);
+
+            $package = $gift;
+
+            return $package;
+            break;
         }
+    }
+
+    protected function delivery_state($args)
+    {
+        $id = $args[0];
+        $delivery_state = json_decode($this->file, TRUE)['delivery_state'];
+
+        $store = new StoreJSON(STORE_FILE);
+        $gifts = $store->load();
+
+        // find gift
+        foreach($gifts as &$gift) {
+            if ($gift['uuid'] != $id) {
+                continue;
+            }
+
+            $gift['delivery_state'] = $delivery_state;
+
+            $store->save($gifts);
+
+            $package = $gift;
+
+            return $package;
+            break;
+        }
+    }
+
+    protected function reset($args)
+    {
+        $converter = new ConverterBitrix();
+        $converter->convert();
     }
 }
 
@@ -361,9 +381,5 @@ class DB
     }
 }
 
-$converter = new ConverterBitrix();
-$converter->convert();
-
 $controller = new MiniServer();
 $controller->run();
-

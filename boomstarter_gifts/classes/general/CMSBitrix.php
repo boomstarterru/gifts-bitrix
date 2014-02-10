@@ -4,10 +4,6 @@ namespace Boomstarter\Gifts;
 
 require_once('CMS.php');
 
-if (is_dir('/home/vital/src')) {
-    define('DEBUG', TRUE);
-}
-
 if (!\CModule::IncludeModule('sale')) {
     die('{"error":"Module \"sale\" not installed"}');
 }
