@@ -173,9 +173,57 @@ class MiniAPI extends API
         if ($this->verb) {
             return $this->{$this->verb}($this->args);
         }
+
+        // все подарки
+        return $this->all($this->args);
+    }
+
+    protected function all($args)
+    {
+        $store = new StoreJSON(STORE_FILE);
+        $gifts = $store->load();
+
+        $package = array(
+            'gifts' => $gifts,
+            '_metadata' => array(
+                'total_count' => count($gifts)
+            ),
+        );
+
+        return $package;
+    }
+
+    protected function shipping($args)
+    {
+        $store = new StoreJSON(STORE_FILE);
+        $gifts = $store->load();
+
+        $package = array(
+            'gifts' => $gifts,
+            '_metadata' => array(
+                'total_count' => count($gifts)
+            ),
+        );
+
+        return $package;
     }
 
     protected function pending($args)
+    {
+        $store = new StoreJSON(STORE_FILE);
+        $gifts = $store->load();
+
+        $package = array(
+            'gifts' => $gifts,
+            '_metadata' => array(
+                'total_count' => count($gifts)
+            ),
+        );
+
+        return $package;
+    }
+
+    protected function delivered($args)
     {
         $store = new StoreJSON(STORE_FILE);
         $gifts = $store->load();

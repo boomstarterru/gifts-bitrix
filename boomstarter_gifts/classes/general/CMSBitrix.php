@@ -197,4 +197,42 @@ class CMSBitrix extends CMS
     {
         return $this->getOption(boomstarter_gifts::OPTION_SHOP_TOKEN);
     }
+
+    public function getButton()
+    {
+        $shop_uuid = $this->getOption(boomstarter_gifts::OPTION_GIFTS_USER_NAME);
+        $shop_open_key = $this->getOption(boomstarter_gifts::OPTION_GIFTS_USER_EMAIL);
+
+        $html = '
+        <script type="text/javascript" src="http://boomstarter.ru/assets/gifts/api/v1.js" async></script>
+        <span class="boomstarter-gift">
+          <a href="#"
+             product-id="<?= $arResult["ID"] ?>"
+             boomstarter-shop-uuid="'.$shop_uuid.'"
+             boomstarter-shop-key="'.$shop_open_key.'"
+             boomstarter-button-style="flat"
+             class="bt3"
+             style="font-weight:bold;
+                    margin: 3px;
+                    border-radius: 5px;
+                    border-right: 1px solid #0169b5;
+                    border-top: 1px solid #5aace5;
+                    border-left: 1px solid #308ccf;
+                    border-bottom: 1px solid #308ccf;
+                    padding: 7px 15px 8px;
+                    white-space: nowrap;
+                    color: white;
+                    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5), 0 0 0 1px #4f99e5;
+                    text-shadow: 0 1px 0 rgba(41, 103, 165, 0.75);
+                    background-image: -webkit-linear-gradient(bottom, #2f7dcd 0%, #2f7dcd 25%, #6baff3 60%, #6baff3 100%);
+                    background-image: -moz-linear-gradient(bottom, #2f7dcd 0%, #2f7dcd 25%, #6baff3 60%, #6baff3 100%);
+                    background-image: -o-linear-gradient(bottom, #2f7dcd 0%, #2f7dcd 25%, #6baff3 60%, #6baff3 100%);
+                    background-image: -ms-linear-gradient(bottom, #2f7dcd 0%, #2f7dcd 25%, #6baff3 60%, #6baff3 100%);
+            ">
+                 Хочу в подарок
+            </a>
+        </span>';
+
+        return $html;
+    }
 }

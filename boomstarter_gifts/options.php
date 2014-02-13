@@ -34,6 +34,15 @@ $arOptions = array(
         'SIZE' => 80,
         'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
     ),
+    'SHOP_OPEN_KEY' => array(
+        'GROUP' => 'MAIN',
+        'TITLE' => 'Открытый ключ',
+        'TYPE' => 'STRING',
+        'DEFAULT' => '',
+        'SORT' => '0',
+        'SIZE' => 80,
+        'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
+    ),
     'SHOP_TOKEN' => array(
         'GROUP' => 'MAIN',
         'TITLE' => 'Приватный токен',

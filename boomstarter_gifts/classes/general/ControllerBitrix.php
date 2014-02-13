@@ -105,9 +105,24 @@ class ControllerBitrix extends Controller
 
         $this->lAdmin->AddHeaders($aHeaders);
 
+        $filter = isset($_GET['only']) ? $_GET['only'] : NULL;
+
         // get gifts
         $api = $this->getApi();
-        $gifts = $api->getGiftsPending();
+
+        switch ($filter) {
+            case 'pending':
+                $gifts = $api->getGiftsPending();
+                break;
+            case 'shipping':
+                $gifts = $api->getGiftsPending();
+                break;
+            case 'delivered':
+                $gifts = $api->getGiftsDelivered();
+                break;
+            default:
+                $gifts = $api->getGiftsAll();
+        }
 
         // cache products
         $arSelect = array("ID", "NAME", "DETAIL_PAGE_URL", "PREVIEW_PICTURE");
@@ -169,10 +184,15 @@ class ControllerBitrix extends Controller
                     break;
             }
 
+            $APPLICATION->AddHeadString(
+                '<style>'.
+                '</style>',
+                true);
+
             $row->AddViewField("ACTION",
-                '<a href="'.$href_accept.'" class="'.$class_accept.'">Принят</a>'.
-                '<a href="'.$href_ship.'" class="'.$class_ship.'">Отправлен</a>'.
-                '<a href="'.$href_delivery.'" class="'.$class_delivery.'">Доставлен</a>'
+                '<a href="'.$href_accept.'" class="'.$class_accept.'">Принять</a>'.
+                '<a href="'.$href_ship.'" class="'.$class_ship.'">Отправить</a>'.
+                '<a href="'.$href_delivery.'" class="'.$class_delivery.'">Доставить</a>'
             );
         }
 
