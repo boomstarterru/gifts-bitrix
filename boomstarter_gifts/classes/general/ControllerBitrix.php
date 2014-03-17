@@ -47,21 +47,10 @@ class ControllerBitrix extends Controller
 
     function __construct()
     {
-        if ($this->isAdminPage()) {
+        if ($this->getCMS()->isAdminPage()) {
             $sTableID = "tbl_gifts";
             $oSort = new CAdminSorting($sTableID, "id", "desc");
             $this->lAdmin = new CAdminList($sTableID, $oSort);
-        }
-    }
-
-    private function isAdminPage()
-    {
-        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-
-        if (stristr(substr($path, 0, strlen('/bitrix/admin/')), '/bitrix/admin/')) {
-            return TRUE;
-        } else {
-            return FALSE;
         }
     }
 
@@ -146,7 +135,7 @@ class ControllerBitrix extends Controller
             $row->AddViewField("NAME", '<a href="'.$products[$gift->product_id]["DETAIL_PAGE_URL"].'" target="_blank">'.$gift->name.'</a>');
             $row->AddViewField("PRICE", number_format($gift->pledged, 0, '.', ' '));
             $row->AddField("PRODUCT_ID", $gift->product_id);
-            $row->AddField("ORDER", $gift->order_id);
+            $row->AddViewField("ORDER", $gift->order_id);
 
             $states = array(
                 Gift::STATE_ACCEPT => 'Принят',
@@ -161,6 +150,7 @@ class ControllerBitrix extends Controller
             $href_delivery = '#';
             $class_accept = "adm-btn adm-btn-disabled";
             $class_ship = "adm-btn adm-btn-disabled";
+            $class_delivery = "adm-btn adm-btn-disabled";
             $class_delivery = "adm-btn adm-btn-disabled";
             $next_state = $gift->getNextState();
 
@@ -184,6 +174,7 @@ class ControllerBitrix extends Controller
                     break;
             }
 
+            /*
             $APPLICATION->AddHeadString(
                 '<style>'.
                 '</style>',
@@ -194,6 +185,23 @@ class ControllerBitrix extends Controller
                 '<a href="'.$href_ship.'" class="'.$class_ship.'">Отправить</a>'.
                 '<a href="'.$href_delivery.'" class="'.$class_delivery.'">Доставить</a>'
             );
+            */
+
+            if ($gift->order_id) {
+                $href_order = '/bitrix/admin/sale_order_detail.php?ID='.$gift->order_id;
+                $row->AddViewField("ORDER",
+                    '<a href="'.$href_order.'">'.$gift->order_id.'</a>'
+                );
+                $href_order = $APPLICATION->GetCurPageParam("action=Order&uuid={$gift->uuid}&price={$gift->pledged}&currency={$gift->currency}&product_id={$gift->product_id}", array("id", "d", "uuid", "action"));
+                $row->AddViewField("ORDER",
+                    '<a href="'.$href_order.'" class="adm-btn adm-btn-green">Создать заказ</a>'
+                );
+            } else {
+                $href_order = $APPLICATION->GetCurPageParam("action=Order&uuid={$gift->uuid}&price={$gift->pledged}&currency={$gift->currency}&product_id={$gift->product_id}", array("id", "d", "uuid", "action"));
+                $row->AddViewField("ORDER",
+                    '<a href="'.$href_order.'" class="adm-btn adm-btn-green">Создать заказ</a>'
+                );
+            }
         }
 
         $this->lAdmin->CheckListMode();
@@ -255,6 +263,28 @@ class ControllerBitrix extends Controller
         } catch (\Boomstarter\Exception $ex) {
             $e = $APPLICATION->GetException();
             $this->lAdmin->AddUpdateError(($e ? $e->getString() : "Gift delivery error"), $uuid);
+            $this->lAdmin->DisplayList();
+        }
+    }
+
+    public function actionOrder()
+    {
+        global $APPLICATION;
+
+        $uuid = $_GET['uuid'];
+        $price = $_GET['price'];
+        $currency = $_GET['currency'];
+        $order_id = CMSBitrix::getInstance()->createOrder($price, $currency, $uuid); // create order
+        // "Клиент: {$gift->owner->first_name} {$gift->owner->last_name}, тел. {$gift->owner->phone}"
+
+        try {
+            $api = $this->getApi();
+            $api->setGiftOrder($uuid, $order_id);
+            $redirect = $APPLICATION->GetCurPageParam('', array("id", "d", "uuid", "action"));
+            LocalRedirect($redirect);
+        } catch (\Boomstarter\Exception $ex) {
+            $e = $APPLICATION->GetException();
+            $this->lAdmin->AddUpdateError(($e ? $e->getString() : "Gift set order error"), $uuid);
             $this->lAdmin->DisplayList();
         }
     }

@@ -19,21 +19,11 @@ if($APPLICATION->GetGroupRight("form")>"D") // проверка уровня д�
         "items_id"    => "menu_gifts",  // идентификатор ветви
         "items"       => array(
             array(
-                'text' => '1. Деньги собраны',
+                'text' => 'Оплаченные',
                 'url' => 'boomstarter_gifts_list.php?only=pending',
                 'title' => 'title',
             ),
-            array(
-                'text' => '2. В доставке',
-                'url' => 'boomstarter_gifts_list.php?only=shipping',
-                'title' => 'title',
-            ),
-            array(
-                'text' => '3. Доставленные',
-                'url' => 'boomstarter_gifts_list.php?only=delivered',
-                'title' => 'title',
-            ),
-        ),          // остальные уровни меню сформируем ниже.
+        ),
     );
 
     // далее выберем список веб-форм и добавим для каждой соответствующий пункт меню

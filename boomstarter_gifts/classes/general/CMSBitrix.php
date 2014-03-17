@@ -82,7 +82,7 @@ class CMSBitrix extends CMS
         global $USER;
 
         $order_id = CSaleOrder::Add(array(
-                "LID" => SITE_ID,
+                "LID" => $this->getSiteId(),
                 "PERSON_TYPE_ID" => 1,
                 "PRICE" => $price,
                 "CURRENCY" => $currency,
@@ -106,7 +106,7 @@ class CMSBitrix extends CMS
             "PRICE" => $price,
             "CURRENCY" => $currency,
             "QUANTITY" => 1,
-            "LID" => SITE_ID,
+            "LID" => $this->getSiteId(),
             "DELAY" => "N",
             "CAN_BUY" => "Y",
             "NAME" => $product_name,
@@ -234,5 +234,21 @@ class CMSBitrix extends CMS
         </span>';
 
         return $html;
+    }
+
+    public function isAdminPage()
+    {
+        $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+
+        if (stristr(substr($path, 0, strlen('/bitrix/admin/')), '/bitrix/admin/')) {
+            return TRUE;
+        } else {
+            return FALSE;
+        }
+    }
+
+    private function getSiteId()
+    {
+        return $this->isAdminPage() ? 's1' : SITE_ID;
     }
 }
