@@ -7,3 +7,4 @@ $MESS['HEADER_PRODUCT_ID'] = "PRODUCT_ID";
 $MESS['HEADER_ORDER'] = "Заказ";
 $MESS['HEADER_STATUS'] = "Статус";
 $MESS['HEADER_ACTION'] = "";
+$MESS['GIFTS_CREATE_ORDER'] = "Создать заказ";
