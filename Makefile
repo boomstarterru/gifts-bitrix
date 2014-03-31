@@ -7,6 +7,6 @@ distr:
 
 lang:
 	cd boomstarter_gifts/lang ; rm -Rf ru.CP1251 
-	cd boomstarter_gifts/lang ; cp -R ru.UTF-8 ru.CP1251
-	cd boomstarter_gifts/lang/ru.UTF-8 ; find . -name "*.php" -exec iconv -f UTF-8 -t CP1251 {} -o ./../ru.CP1251/{} \;
+	cd boomstarter_gifts/lang ; cp -R ru.UTF-8 ru.windows-1251
+	cd boomstarter_gifts/lang/ru.UTF-8 ; find . -name "*.php" -exec iconv -f UTF-8 -t CP1251 {} -o ./../ru.windows-1251/{} \;
 	cd boomstarter_gifts/lang ; git add -A . ; git commit . -m "lang"

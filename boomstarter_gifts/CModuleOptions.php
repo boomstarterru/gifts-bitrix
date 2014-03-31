@@ -1,5 +1,7 @@
 <?php
 
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/main/options.php');
+
 class CModuleOptions
 {
     public $arCurOptionValues = array();
@@ -21,9 +23,9 @@ class CModuleOptions
         if($need_access_tab)
             $this->arTabs[] = array(
                 'DIV' => 'edit_access_tab',
-                'TAB' => 'Права доступа',
+                'TAB' => 'Access',
                 'ICON' => '',
-                'TITLE' => 'Настройка прав доступа'
+                'TITLE' => 'Access settings'
             );
 
         if($_REQUEST['update'] == 'Y' && check_bitrix_sessid()){
@@ -264,9 +266,9 @@ class CModuleOptions
 
             $tabControl->Buttons();
 
-            echo     '<input type="hidden" name="update" value="Y" />
-                    <input type="submit" name="save" value="Сохранить" />
-                    <input type="reset" name="reset" value="Отменить" />
+            echo  '<input type="hidden" name="update" value="Y" />
+                    <input type="submit" name="save" value="' . GetMessage('MAIN_SAVE') . '" />
+                    <input type="reset" name="reset" value="' . GetMessage('MAIN_OPT_CANCEL') . '" />
                     </form>';
 
             $tabControl->End();

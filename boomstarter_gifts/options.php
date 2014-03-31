@@ -4,73 +4,75 @@ $module_id = 'boomstarter_gifts';
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$module_id.'/include.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$module_id.'/CModuleOptions.php');
-
-$showRightsTab = true;
-$arSel = array(
-    'REFERENCE_ID' => array(1, 3, 5, 7),
-    'REFERENCE' => array('Значение 1', 'Значение 2', 'Значение 3', 'Значение 4')
-);
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/options.php', 'ru.'.LANG_CHARSET);
 
 $arTabs = array(
     array(
-        'DIV' => 'edit1',
-        'TAB' => 'Настройки',
+        'DIV' => 'fedit1',
+        'TAB' => GetMessage('OPTIONS_TAB_NAME'), // 'Настройки'
         'ICON' => '',
-        'TITLE' => 'Настройки'
+        'TITLE' => GetMessage('OPTIONS_TAB_NAME') // 'Настройки'
     )
 );
 
 $arGroups = array(
-    'MAIN' => array('TITLE' => 'Настройки Boomstarter Gifts', 'TAB' => 0)
+    'MAIN' => array('TITLE' => GetMessage('OPTIONS_TAB_TITLE'), 'TAB' => 0) // 'Настройки Boomstarter Gifts'
 );
 
 $arOptions = array(
     'SHOP_UUID' => array(
         'GROUP' => 'MAIN',
-        'TITLE' => 'UUID магазина',
+        'TITLE' => GetMessage('OPTIONS_SHOP_UUID'), // 'UUID магазина',
         'TYPE' => 'STRING',
         'DEFAULT' => '',
         'SORT' => '0',
         'SIZE' => 80,
-        'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
+        //'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
     ),
     'SHOP_OPEN_KEY' => array(
         'GROUP' => 'MAIN',
-        'TITLE' => 'Открытый ключ',
+        'TITLE' => GetMessage('OPTIONS_SHOP_OPEN_KEY'), // 'Открытый ключ',
         'TYPE' => 'STRING',
         'DEFAULT' => '',
         'SORT' => '0',
         'SIZE' => 80,
-        'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
+        //'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
     ),
     'SHOP_TOKEN' => array(
         'GROUP' => 'MAIN',
-        'TITLE' => 'Приватный токен',
+        'TITLE' => GetMessage('OPTIONS_SHOP_TOKEN'), // 'Приватный токен',
         'TYPE' => 'STRING',
         'DEFAULT' => '',
         'SORT' => '0',
         'SIZE' => 80,
-        'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
+        ///'NOTES' => 'Указан в настройках магазина <a href="https://boomstarter.ru/gifts/management" target="_blank">здесь</a>. В разделе интеграция.'
     ),
     'GIFTS_USER_NAME' => array(
         'GROUP' => 'MAIN',
-        'TITLE' => 'Логин пользователя',
+        'TITLE' => GetMessage('OPTIONS_GIFTS_USER_NAME'), // 'Логин пользователя',
         'TYPE' => 'STRING',
         'DEFAULT' => 'Boomstarter',
         'SORT' => '3',
         'SIZE' => 80,
-        'NOTES' => 'Все подарки оформляются на одного пользователя. Здесь его логин.'
+        //'NOTES' => 'Все подарки оформляются на одного пользователя. Здесь его логин.'
     ),
     'GIFTS_USER_EMAIL' => array(
         'GROUP' => 'MAIN',
-        'TITLE' => 'Еmail пользователя',
+        'TITLE' => GetMessage('OPTIONS_GIFTS_USER_EMAIL'), // 'Еmail пользователя',
         'TYPE' => 'STRING',
         'DEFAULT' => 'api@boomstarter.ru',
         'SORT' => '4',
         'SIZE' => 80,
-        'NOTES' => 'Все подарки оформляются на одного пользователя. Здесь его email.'
+        //'NOTES' => 'Все подарки оформляются на одного пользователя. Здесь его email.'
     )
 );
 
-$opt = new CModuleOptions($module_id, $arTabs, $arGroups, $arOptions, $showRightsTab);
+$tabControl = new CAdminTabControl("tabControl", $aTabs);
+$tabControl->Begin();
+$tabControl->BeginNextTab();
+
+$opt = new CModuleOptions($module_id, $arTabs, $arGroups, $arOptions, false);
 $opt->ShowHTML();
+
+$tabControl->EndTab();
+$tabControl->End();
