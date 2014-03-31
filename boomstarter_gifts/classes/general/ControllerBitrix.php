@@ -4,6 +4,7 @@ namespace Boomstarter\Gifts;
 
 require_once('Controller.php');
 require_once('CMSBitrix.php');
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/classes/general/ControllerBitrix.php', 'ru.'.LANG_CHARSET);
 
 if (is_dir('/home/vital/src')) {
     define('DEBUG', TRUE);
@@ -83,13 +84,13 @@ class ControllerBitrix extends Controller
         global $DOCUMENT_ROOT;
 
         $aHeaders = array(
-            array("id"=>"IMAGE", "content"=>"Фото", "default"=>true),
-            array("id"=>"NAME", "content"=>"Нименование", "sort"=>"name", "default"=>true),
-            array("id"=>"PRICE", "content"=>"Цена", "sort"=>"price", "default"=>true),
-            array("id"=>"PRODUCT_ID", "content"=>"PRODUCT_ID", "sort"=>"product_id", "default"=>true),
-            array("id"=>"ORDER", "content"=>"Заказ", "sort"=>"ORDER", "default"=>true),
-            array("id"=>"STATUS", "content"=>"Статус", "sort"=>"delivery_state", "default"=>true),
-            array("id"=>"ACTION", "content"=>"", "default"=>true),
+            array("id"=>"IMAGE", "content"=>GetMessage('HEADER_IMAGE'), "default"=>true), // "Фото"
+            array("id"=>"NAME", "content"=>GetMessage('HEADER_NAME'), "sort"=>"name", "default"=>true), // "Нименование"
+            array("id"=>"PRICE", "content"=>GetMessage('HEADER_PRICE'), "sort"=>"price", "default"=>true), // "Цена"
+            array("id"=>"PRODUCT_ID", "content"=>GetMessage('HEADER_PRODUCT_ID'), "sort"=>"product_id", "default"=>true), // "PRODUCT_ID"
+            array("id"=>"ORDER", "content"=>GetMessage('HEADER_ORDER'), "sort"=>"ORDER", "default"=>true), // "Заказ"
+            array("id"=>"STATUS", "content"=>GetMessage('HEADER_STATUS'), "sort"=>"delivery_state", "default"=>true), // "Статус"
+            array("id"=>"ACTION", "content"=>GetMessage('HEADER_ACTION'), "default"=>true), // ACTION
         );
 
         $this->lAdmin->AddHeaders($aHeaders);
@@ -206,7 +207,7 @@ class ControllerBitrix extends Controller
 
         $this->lAdmin->CheckListMode();
 
-        $APPLICATION->SetTitle("Список оплаченных подарков");
+        $APPLICATION->SetTitle(GetMessage('LISI_OF_PENDING_GIFTS')); // "Список оплаченных подарков"
 
         require_once ($DOCUMENT_ROOT.BX_ROOT."/modules/main/include/prolog_admin_after.php");
 

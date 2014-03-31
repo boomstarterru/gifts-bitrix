@@ -3,5 +3,7 @@
 if (!check_bitrix_sessid())
     return;
 
-echo CAdminMessage::ShowNote("Модуль Boomstarter Gifts установлен");
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/install/step.php', 'ru.'.LANG_CHARSET);
+
+echo CAdminMessage::ShowNote(GetMessage('INSTALL_MODULE_SUCCESS'));
 

@@ -1,5 +1,7 @@
 <?php
 
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/install/index.php', 'ru.'.LANG_CHARSET);
+
 Class boomstarter_gifts extends CModule
 {
     const OPTION_SHOP_UUID = "SHOP_UUID";
@@ -10,13 +12,14 @@ Class boomstarter_gifts extends CModule
     var $MODULE_ID = "boomstarter_gifts";
     var $MODULE_VERSION;
     var $MODULE_VERSION_DATE;
-    var $MODULE_NAME = "Boomstarter Gifts";
-    var $MODULE_DESCRIPTION = "Подарки через Boomstarter Gifts API";
+    var $MODULE_NAME = '';
+    var $MODULE_DESCRIPTION = '';
     var $MODULE_CSS;
-    var $PARTNER_NAME = "Boomstarter";
+    var $PARTNER_NAME = '';
 
     function boomstarter_gifts()
     {
+        global $MESS;
         $arModuleVersion = array();
 
         $path = str_replace("\\", "/", __FILE__);
@@ -29,6 +32,11 @@ Class boomstarter_gifts extends CModule
             $this->MODULE_VERSION = $arModuleVersion["VERSION"];
             $this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
         }
+
+        // lang
+        $this->MODULE_NAME = $MESS['MODULE_NAME'];
+        $this->MODULE_DESCRIPTION = $MESS['MODULE_DESCRIPTION'];
+        $this->PARTNER_NAME = $MESS['PARTNER_NAME'];
     }
 
     function InstallFiles($arParams = array())
@@ -69,13 +77,13 @@ Class boomstarter_gifts extends CModule
 
     function DoInstall()
     {
-        global $DOCUMENT_ROOT, $APPLICATION;
+        global $DOCUMENT_ROOT, $APPLICATION, $MESS;
 
         $this->InstallFiles();
 
         RegisterModule($this->MODULE_ID);
 
-        $APPLICATION->IncludeAdminFile("Установка модуля " . $this->MODULE_ID, $DOCUMENT_ROOT."/bitrix/modules/" . $this->MODULE_ID . "/install/step.php");
+        $APPLICATION->IncludeAdminFile($MESS['INSTALL_MODULE'] . ' ' . $this->MODULE_ID, $DOCUMENT_ROOT."/bitrix/modules/" . $this->MODULE_ID . "/install/step.php");
 
         // default options
         include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/default_options.php");
@@ -85,11 +93,12 @@ Class boomstarter_gifts extends CModule
         }
 
         return true;
+        // LANG_CHARSET
     }
 
     function DoUninstall()
     {
-        global $DOCUMENT_ROOT, $APPLICATION;
+        global $DOCUMENT_ROOT, $APPLICATION, $MESS;
 
         // remove options
         include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/default_options.php");
@@ -103,7 +112,7 @@ Class boomstarter_gifts extends CModule
 
         UnRegisterModule($this->MODULE_ID);
 
-        $APPLICATION->IncludeAdminFile("Деинсталляция модуля " . $this->MODULE_ID, $DOCUMENT_ROOT."/bitrix/modules/" . $this->MODULE_ID . "/install/unstep.php");
+        $APPLICATION->IncludeAdminFile($MESS['UNINSTALL_MODULE'] . ' ' . $this->MODULE_ID, $DOCUMENT_ROOT."/bitrix/modules/" . $this->MODULE_ID . "/install/unstep.php");
 
         return true;
     }

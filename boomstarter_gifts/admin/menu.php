@@ -2,7 +2,7 @@
 
 $module_id = 'boomstarter_gifts';
 
-IncludeModuleLangFile(__FILE__); // в menu.php точно так же можно использовать языковые файлы
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/admin/menu.php', 'ru.'.LANG_CHARSET);
 
 if($APPLICATION->GetGroupRight("form")>"D") // проверка уровня доступа к модулю веб-форм
 {
@@ -12,14 +12,14 @@ if($APPLICATION->GetGroupRight("form")>"D") // проверка уровня д�
         "sort"        => 100,                    // вес пункта меню
         "module_id"   => $module_id,
         "url"         => "boomstarter_gifts_list.php",  // ссылка на пункте меню
-        "text"        => "Подарки",       // текст пункта меню
-        "title"       => "Подарки через Boomstarter", // текст всплывающей подсказки
+        "text"        => GetMessage('GIFTS_TEXT'),       // текст пункта меню "Подарки"
+        "title"       => GetMessage('GIFTS_TITLE'), // текст всплывающей подсказки "Подарки через Boomstarter"
         "icon"        => "form_menu_icon", // малая иконка
         "page_icon"   => "form_page_icon", // большая иконка
         "items_id"    => "menu_gifts",  // идентификатор ветви
         "items"       => array(
             array(
-                'text' => 'Оплаченные',
+                'text' => GetMessage('GIFTS_PENDING'), // 'Оплаченные'
                 'url' => 'boomstarter_gifts_list.php?only=pending',
                 'title' => 'title',
             ),
