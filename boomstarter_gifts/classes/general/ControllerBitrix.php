@@ -133,7 +133,7 @@ class ControllerBitrix extends Controller
                     'image' => '',
                 ));
             $row->AddViewField("IMAGE", '<img src="'.CFile::GetPath($products[$gift->product_id]["PREVIEW_PICTURE"]).'"/>');
-            $row->AddViewField("NAME", '<a href="'.$products[$gift->product_id]["DETAIL_PAGE_URL"].'" target="_blank">'.$gift->name.'</a>');
+            $row->AddViewField("NAME", '<a href="'.$products[$gift->product_id]["DETAIL_PAGE_URL"].'" target="_blank">' . iconv('UTF-8', LANG_CHARSET, $gift->name) . '</a>');
             $row->AddViewField("PRICE", number_format($gift->pledged, 0, '.', ' '));
             $row->AddField("PRODUCT_ID", $gift->product_id);
             $row->AddViewField("ORDER", $gift->order_id);
@@ -195,12 +195,12 @@ class ControllerBitrix extends Controller
                 );
                 $href_order = $APPLICATION->GetCurPageParam("action=Order&uuid={$gift->uuid}&price={$gift->pledged}&currency={$gift->currency}&product_id={$gift->product_id}", array("id", "d", "uuid", "action"));
                 $row->AddViewField("ORDER",
-                    '<a href="'.$href_order.'" class="adm-btn adm-btn-green">Создать заказ</a>'
+                    '<a href="'.$href_order.'" class="adm-btn adm-btn-green">' . GetMessage('GIFTS_CREATE_ORDER') . '</a>'
                 );
             } else {
                 $href_order = $APPLICATION->GetCurPageParam("action=Order&uuid={$gift->uuid}&price={$gift->pledged}&currency={$gift->currency}&product_id={$gift->product_id}", array("id", "d", "uuid", "action"));
                 $row->AddViewField("ORDER",
-                    '<a href="'.$href_order.'" class="adm-btn adm-btn-green">Создать заказ</a>'
+                    '<a href="'.$href_order.'" class="adm-btn adm-btn-green">' . GetMessage('GIFTS_CREATE_ORDER') . '</a>'
                 );
             }
         }
