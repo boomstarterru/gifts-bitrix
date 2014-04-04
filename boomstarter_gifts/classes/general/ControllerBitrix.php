@@ -200,8 +200,9 @@ class ControllerBitrix extends Controller
                 );
                 */
             } else {
-                $product = $this->getCMS()->getProduct($gift->product_id);
-                $currency = $this->getCMS()->getProductCurrency($product);
+                //$product = $this->getCMS()->getProduct($gift->product_id);
+                //$currency = $this->getCMS()->getProductCurrency($product);
+                $currency = "RUB";
                 $href_order = $APPLICATION->GetCurPageParam("action=Order&uuid={$gift->uuid}&price={$gift->pledged}&currency={$currency}&product_id={$gift->product_id}", array("id", "d", "uuid", "action"));
                 $row->AddViewField("ORDER",
                     '<a href="'.$href_order.'" class="adm-btn adm-btn-green">' . GetMessage('GIFTS_CREATE_ORDER') . '</a>'
