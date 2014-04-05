@@ -1,6 +1,7 @@
 <?php
 
 define('STORE_FILE', '/tmp/bitrix.json');
+define('STORE_YML', 'http://bitrix2.local/bitrix/catalog_export/yandex_430247.php');
 
 
 /**
@@ -180,7 +181,7 @@ class MiniAPI extends API
 
     protected function all($args)
     {
-        $store = new StoreJSON(STORE_FILE);
+        $store = $this->getStore();
         $gifts = $store->load();
 
         $package = array(
@@ -210,7 +211,7 @@ class MiniAPI extends API
 
     protected function pending($args)
     {
-        $store = new StoreJSON(STORE_FILE);
+        $store = $this->getStore();
         $gifts = $store->load();
 
         $package = array(
@@ -243,7 +244,7 @@ class MiniAPI extends API
         $id = $args[0];
         $order_id = json_decode($this->file, TRUE)['order_id'];
 
-        $store = new StoreJSON(STORE_FILE);
+        $store = $this->getStore();
         $gifts = $store->load();
 
         // find gift
@@ -293,6 +294,13 @@ class MiniAPI extends API
         $converter = new ConverterBitrix();
         $converter->convert();
     }
+
+    private function getStore()
+    {
+        //$store = new StoreJSON(STORE_FILE);
+        $store = new StoreYML(STORE_YML);
+        return $store;
+    }
 }
 
 
@@ -322,6 +330,47 @@ class StoreJSON
         $json = file_get_contents($this->filename);
         $mixed = json_decode($json, TRUE);
         return $mixed;
+    }
+}
+
+
+class StoreYML
+{
+    private $url = '';
+
+    function __construct($url)
+    {
+        $this->url = $url;
+    }
+
+    public function save($mixed)
+    {
+    }
+
+    public function load()
+    {
+        $gifts = array();
+
+        $yml = file_get_contents($this->url);
+        $xml = simplexml_load_string($yml);
+
+        foreach($xml->shop->offers->offer as $offer) {
+            $gifts[] = array(
+                'uuid' => "uuid_".$offer['id'],
+                'product_id' => strval($offer['id']),
+                'name' => strval($offer->name),
+                'pledged' => strval($offer->price),
+                'url' => strval($offer->url),
+                'image' => strval($offer->picture),
+                'owner' => array(
+                    'first_name' => 'Тестер',
+                    'last_name' => 'Тестеров',
+                    'phone' => '8-123-456-78-90',
+                ),
+            );
+        }
+
+        return $gifts;
     }
 }
 

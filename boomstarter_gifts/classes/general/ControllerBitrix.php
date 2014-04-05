@@ -277,10 +277,12 @@ class ControllerBitrix extends Controller
     {
         global $APPLICATION;
 
+        $product_id = $_GET['product_id'];
         $uuid = $_GET['uuid'];
-        $price = $_GET['price'];
-        $currency = $_GET['currency'];
-        $order_id = CMSBitrix::getInstance()->createOrder($price, $currency, $uuid); // create order
+        //$price = $_GET['price'];
+        //$currency = $_GET['currency'];
+        //$order_id = CMSBitrix::getInstance()->createOrder($price, $currency, $uuid); // create order
+        $order_id = CMSBitrix::getInstance()->buyProduct($product_id);
         // "Клиент: {$gift->owner->first_name} {$gift->owner->last_name}, тел. {$gift->owner->phone}"
 
         try {

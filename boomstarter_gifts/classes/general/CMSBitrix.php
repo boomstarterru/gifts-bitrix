@@ -52,8 +52,8 @@ class CMSBitrix extends CMS
 
     public function getProductPrice($product)
     {
-        // return \CPrice::GetBasePrice($product['ID']);
-        return $product['PROPERTIES']['PRICE']['VALUE'];
+        return (float)\CPrice::GetBasePrice($product['ID'])['PRICE'];
+        //return $product['PROPERTIES']['PRICE']['VALUE'];
     }
 
     public function getProductCurrency($product)
@@ -101,7 +101,7 @@ class CMSBitrix extends CMS
     {
         $module = new boomstarter_gifts();
 
-        $arFields = array(
+        $result = CSaleBasket::Add(array(
             "PRODUCT_ID" => $product_id,
             "PRICE" => $price,
             "CURRENCY" => $currency,
@@ -113,9 +113,9 @@ class CMSBitrix extends CMS
             "MODULE" => $module->MODULE_ID,
             "NOTES" => "Подарок через Boomstarter Gifts API",
             "IGNORE_CALLBACK_FUNC" => "Y",
-        );
+        ));
 
-        $result = CSaleBasket::Add($arFields);
+        return $result;
     }
 
     public function getBoomstarterUser()
@@ -185,7 +185,7 @@ class CMSBitrix extends CMS
 
     public function orderBasket($order_id)
     {
-        CSaleBasket::OrderBasket($order_id);
+        $result = CSaleBasket::OrderBasket($order_id, 0, $this->getSiteId());
     }
 
     public function getShopUuid()
@@ -247,8 +247,45 @@ class CMSBitrix extends CMS
         }
     }
 
+    /**
+     * Купить продукт
+     *
+     * @param $product_id
+     * @param $gift \Boomstarter\Gift
+     * @return mixed
+     */
+    public function buyProduct($product_id, $gift=NULL)
+    {
+        // продукт
+        $product = $this->getProduct($product_id);
+
+        $price = $this->getProductPrice($product);
+        $currency = $this->getProductCurrency($product);
+        $product_name = $this->getProductName($product);
+
+        // Пользователь
+        $this->getBoomstarterUser();
+
+        // Наполнить корзину
+        $this->clearBasket();
+        $res = $this->addToBasket($product_id, $product_name, $price, $currency);
+
+        // Создать заказ
+        $order_id = $this->createOrder(
+            $price,
+            $currency,
+            $gift ? : $gift->uuid,
+            $gift ? "Клиент: {$gift->owner->first_name} {$gift->owner->last_name}, тел. {$gift->owner->phone}" : '---' );
+
+        // Выполнить покупку
+        $this->orderBasket($order_id);
+
+        return $order_id;
+    }
+
     private function getSiteId()
     {
         return $this->isAdminPage() ? 's1' : SITE_ID;
     }
+
 }
