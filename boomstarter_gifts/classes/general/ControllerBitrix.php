@@ -193,17 +193,8 @@ class ControllerBitrix extends Controller
                 $row->AddViewField("ORDER",
                     '<a href="'.$href_order.'">'.$gift->order_id.'</a>'
                 );
-                /*
-                $href_order = $APPLICATION->GetCurPageParam("action=Order&uuid={$gift->uuid}&price={$gift->pledged}&currency={$gift->currency}&product_id={$gift->product_id}", array("id", "d", "uuid", "action"));
-                $row->AddViewField("ORDER",
-                    '<a href="'.$href_order.'" class="adm-btn adm-btn-green">' . GetMessage('GIFTS_CREATE_ORDER') . '</a>'
-                );
-                */
             } else {
-                //$product = $this->getCMS()->getProduct($gift->product_id);
-                //$currency = $this->getCMS()->getProductCurrency($product);
-                $currency = "RUB";
-                $href_order = $APPLICATION->GetCurPageParam("action=Order&uuid={$gift->uuid}&price={$gift->pledged}&currency={$currency}&product_id={$gift->product_id}", array("id", "d", "uuid", "action"));
+                $href_order = $APPLICATION->GetCurPageParam("action=Order&uuid={$gift->uuid}&product_id={$gift->product_id}", array("id", "d", "uuid", "action", "product_id"));
                 $row->AddViewField("ORDER",
                     '<a href="'.$href_order.'" class="adm-btn adm-btn-green">' . GetMessage('GIFTS_CREATE_ORDER') . '</a>'
                 );
@@ -279,9 +270,6 @@ class ControllerBitrix extends Controller
 
         $product_id = $_GET['product_id'];
         $uuid = $_GET['uuid'];
-        //$price = $_GET['price'];
-        //$currency = $_GET['currency'];
-        //$order_id = CMSBitrix::getInstance()->createOrder($price, $currency, $uuid); // create order
         $order_id = CMSBitrix::getInstance()->buyProduct($product_id);
         // "Клиент: {$gift->owner->first_name} {$gift->owner->last_name}, тел. {$gift->owner->phone}"
 

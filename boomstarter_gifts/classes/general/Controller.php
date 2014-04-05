@@ -108,29 +108,8 @@ class Controller
                 continue;
             }
 
-            // продукт
-            $product = $cms->getProduct($gift->product_id);
-
-            $price = $cms->getProductPrice($product);
-            $currency = $cms->getProductCurrency($product);
-            $product_name = $cms->getProductName($product);
-
-            // Пользователь
-            $cms->getBoomstarterUser();
-
-            // Наполнить корзину
-            $cms->clearBasket();
-            $cms->addToBasket($gift->product_id, $product_name, $price, $currency);
-
-            // Создать заказ
-            $order_id = $cms->createOrder(
-                $price,
-                $currency,
-                $gift->uuid,
-                "Клиент: {$gift->owner->first_name} {$gift->owner->last_name}, тел. {$gift->owner->phone}");
-
-            // Выполнить покупку
-            $cms->orderBasket($order_id);
+            // Оформить покупку
+            $order_id = CMSBitrix::getInstance()->buyProduct($gift->product_id, $gift);
 
             // Отправить код заказа
             try {
