@@ -264,6 +264,7 @@ class CMSBitrix extends CMS
         $product_name = $this->getProductName($product);
 
         // Пользователь
+        $user = $this->getCurrentUser();
         $this->getBoomstarterUser();
 
         // Наполнить корзину
@@ -280,7 +281,21 @@ class CMSBitrix extends CMS
         // Выполнить покупку
         $this->orderBasket($order_id);
 
+        // Восстановить админа
+        $this->authorizeUser($user);
+
         return $order_id;
+    }
+
+    public function getCurrentUser()
+    {
+        global $USER;
+        return $USER->GetID();
+    }
+
+    public function authorizeUser($user)
+    {
+        CUser::Authorize($user);
     }
 
     private function getSiteId()
