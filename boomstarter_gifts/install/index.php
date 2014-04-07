@@ -6,6 +6,7 @@ Class boomstarter_gifts extends CModule
 {
     const OPTION_SHOP_UUID = "SHOP_UUID";
     const OPTION_SHOP_TOKEN = "SHOP_TOKEN";
+    const OPTIONS_SHOP_OPEN_KEY = "SHOP_OPEN_KEY";
     const OPTION_GIFTS_USER_NAME = "GIFTS_USER_NAME";
     const OPTION_GIFTS_USER_EMAIL = "GIFTS_USER_EMAIL";
 
@@ -115,5 +116,11 @@ Class boomstarter_gifts extends CModule
         $APPLICATION->IncludeAdminFile($MESS['UNINSTALL_MODULE'] . ' ' . $this->MODULE_ID, $DOCUMENT_ROOT."/bitrix/modules/" . $this->MODULE_ID . "/install/unstep.php");
 
         return true;
+    }
+
+    public static function renderButton($product_id, $button_class='boomstarter-gift')
+    {
+        require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts' . '/classes/general/CMSBitrix.php');
+        echo \Boomstarter\Gifts\CMSBitrix::getInstance()->getButton($product_id, $button_class);
     }
 }

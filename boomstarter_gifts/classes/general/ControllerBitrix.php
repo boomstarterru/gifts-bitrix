@@ -6,10 +6,6 @@ require_once('Controller.php');
 require_once('CMSBitrix.php');
 IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/classes/general/ControllerBitrix.php', 'ru.'.LANG_CHARSET);
 
-if (is_dir('/home/vital/src')) {
-    define('DEBUG', TRUE);
-}
-
 use Boomstarter\Gift;
 use \CModule;
 use \CMain;
