@@ -1,6 +1,6 @@
 <?php
 
-IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/install/index.php', 'ru.'.LANG_CHARSET);
+//IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/install/index.php', 'ru.'.LANG_CHARSET);
 
 Class boomstarter_gifts extends CModule
 {
@@ -10,13 +10,12 @@ Class boomstarter_gifts extends CModule
     const OPTION_GIFTS_USER_NAME = "GIFTS_USER_NAME";
     const OPTION_GIFTS_USER_EMAIL = "GIFTS_USER_EMAIL";
 
-    var $MODULE_ID = "boomstarter_gifts";
+    var $MODULE_ID = "boomstarter.gifts";
     var $MODULE_VERSION;
     var $MODULE_VERSION_DATE;
     var $MODULE_NAME = '';
-    var $MODULE_DESCRIPTION = '';
+    var $MODULE_DESCRIPTION = 'Подарки через Boomstarter Gifts API';
     var $MODULE_CSS;
-    var $PARTNER_NAME = '';
 
     function boomstarter_gifts()
     {
@@ -34,10 +33,8 @@ Class boomstarter_gifts extends CModule
             $this->MODULE_VERSION_DATE = $arModuleVersion["VERSION_DATE"];
         }
 
-        // lang
-        $this->MODULE_NAME = $MESS['MODULE_NAME'];
-        $this->MODULE_DESCRIPTION = $MESS['MODULE_DESCRIPTION'];
-        $this->PARTNER_NAME = $MESS['PARTNER_NAME'];
+        $this->PARTNER_NAME = 'Boomstarter';
+        $this->PARTNER_URI = 'https://boomstarter.ru/gifts/';
     }
 
     function InstallFiles($arParams = array())
