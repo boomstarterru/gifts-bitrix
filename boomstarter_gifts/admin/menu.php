@@ -1,8 +1,8 @@
 <?php
 
-$module_id = 'boomstarter_gifts';
+$module_id = 'boomstarter.gifts';
 
-IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/admin/menu.php', 'ru.'.LANG_CHARSET);
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/'.$module_id.'/admin/menu.php', 'ru.'.LANG_CHARSET);
 
 if($APPLICATION->GetGroupRight("form")>"D") // проверка уровня доступа к модулю веб-форм
 {
@@ -25,9 +25,6 @@ if($APPLICATION->GetGroupRight("form")>"D") // проверка уровня д�
             ),
         ),
     );
-
-    // далее выберем список веб-форм и добавим для каждой соответствующий пункт меню
-    require_once($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$module_id."/include.php");
 
     // вернем полученный список
     return $aMenu;

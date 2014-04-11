@@ -4,7 +4,7 @@ namespace Boomstarter\Gifts;
 
 require_once('Controller.php');
 require_once('CMSBitrix.php');
-IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/classes/general/ControllerBitrix.php', 'ru.'.LANG_CHARSET);
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter.gifts/classes/general/ControllerBitrix.php', 'ru.'.LANG_CHARSET);
 
 use Boomstarter\Gift;
 use \CModule;
@@ -32,8 +32,8 @@ if (!CModule::IncludeModule('iblock')) {
     die('{"error":"Module \"iblock\" not installed"}');
 }
 
-if (!\CModule::IncludeModule('boomstarter_gifts')) {
-    die('{"error":"Module \"boomstarter_gifts\" not installed"}');
+if (!\CModule::IncludeModule('boomstarter.gifts')) {
+    die('{"error":"Module \"boomstarter.gifts\" not installed"}');
 }
 
 CModule::IncludeModule('currency');

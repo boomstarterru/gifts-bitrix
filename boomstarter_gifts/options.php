@@ -1,10 +1,10 @@
 <?php
 
-$module_id = 'boomstarter_gifts';
+$module_id = 'boomstarter.gifts';
 
 require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$module_id.'/include.php');
 require_once($_SERVER['DOCUMENT_ROOT'].'/bitrix/modules/'.$module_id.'/CModuleOptions.php');
-IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/options.php', 'ru.'.LANG_CHARSET);
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/'.$module_id.'/options.php', 'ru.'.LANG_CHARSET);
 
 $arTabs = array(
     array(

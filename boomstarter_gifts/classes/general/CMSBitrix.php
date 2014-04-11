@@ -16,8 +16,8 @@ if (!\CModule::IncludeModule('iblock')) {
     die('{"error":"Module \"iblock\" not installed"}');
 }
 
-if (!\CModule::IncludeModule('boomstarter_gifts')) {
-    die('{"error":"Module \"boomstarter_gifts\" not installed"}');
+if (!\CModule::IncludeModule('boomstarter.gifts')) {
+    die('{"error":"Module \"boomstarter.gifts\" not installed"}');
 }
 
 use \COption;

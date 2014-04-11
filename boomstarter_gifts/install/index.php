@@ -1,6 +1,6 @@
 <?php
 
-//IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts/install/index.php', 'ru.'.LANG_CHARSET);
+IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter.gifts/install/index.php', 'ru.'.LANG_CHARSET);
 
 Class boomstarter_gifts extends CModule
 {
@@ -13,8 +13,8 @@ Class boomstarter_gifts extends CModule
     var $MODULE_ID = "boomstarter.gifts";
     var $MODULE_VERSION;
     var $MODULE_VERSION_DATE;
-    var $MODULE_NAME = '';
-    var $MODULE_DESCRIPTION = 'ÐŸÐ¾Ð´Ð°Ñ€ÐºÐ¸ Ñ‡ÐµÑ€ÐµÐ· Boomstarter Gifts API';
+    var $MODULE_NAME = 'Boomstarter.Gifts';
+    var $MODULE_DESCRIPTION = 'Ïîäàðêè ÷åðåç Boomstarter Gifts API';
     var $MODULE_CSS;
 
     function boomstarter_gifts()
@@ -41,14 +41,14 @@ Class boomstarter_gifts extends CModule
     {
         // admin
         CopyDirFiles(
-            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/install/admin",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter.gifts/install/admin",
             $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin",
             true, true
         );
 
         // services
         CopyDirFiles(
-            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/install/services",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter.gifts/install/services",
             $_SERVER["DOCUMENT_ROOT"]."/bitrix/services",
             true, true
         );
@@ -60,13 +60,13 @@ Class boomstarter_gifts extends CModule
     {
         // admin
         DeleteDirFiles(
-            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/install/admin",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter.gifts/install/admin",
             $_SERVER["DOCUMENT_ROOT"]."/bitrix/admin"
         );
 
         // services
         DeleteDirFiles(
-            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/".$this->MODULE_ID."/install/services",
+            $_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter.gifts/install/services",
             $_SERVER["DOCUMENT_ROOT"]."/bitrix/services"
         );
 
@@ -84,14 +84,14 @@ Class boomstarter_gifts extends CModule
         $APPLICATION->IncludeAdminFile($MESS['INSTALL_MODULE'] . ' ' . $this->MODULE_ID, $DOCUMENT_ROOT."/bitrix/modules/" . $this->MODULE_ID . "/install/step.php");
 
         // default options
-        include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/default_options.php");
+        include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/'.$this->MODULE_ID.'/default_options.php");
 
+        /* @var $boomstarter_gifts_default_option array */
         foreach($boomstarter_gifts_default_option as $key=>$value) {
             COption::SetOptionString($this->MODULE_ID, $key, $value);
         }
 
         return true;
-        // LANG_CHARSET
     }
 
     function DoUninstall()
@@ -99,8 +99,9 @@ Class boomstarter_gifts extends CModule
         global $DOCUMENT_ROOT, $APPLICATION, $MESS;
 
         // remove options
-        include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/boomstarter_gifts/default_options.php");
+        include($_SERVER["DOCUMENT_ROOT"]."/bitrix/modules/'.$this->MODULE_ID.'/default_options.php");
 
+        /* @var $boomstarter_gifts_default_option array */
         foreach($boomstarter_gifts_default_option as $key=>$value) {
             COption::RemoveOption($this->MODULE_ID, $key);
         }
@@ -117,7 +118,7 @@ Class boomstarter_gifts extends CModule
 
     public static function renderButton($product_id, $button_class='boomstarter-gift')
     {
-        require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter_gifts' . '/classes/general/CMSBitrix.php');
+        require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/'.self::MODULE_ID.'/classes/general/CMSBitrix.php');
         echo \Boomstarter\Gifts\CMSBitrix::getInstance()->getButton($product_id, $button_class);
     }
 }

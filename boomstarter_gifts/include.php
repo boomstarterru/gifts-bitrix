@@ -1,7 +1,7 @@
 <?php
 
 CModule::AddAutoloadClasses(
-    "boomstarter_gifts",
+    "boomstarter.gifts",
     array(
         'boomstarter_gifts' => 'install/index.php',
         'API' => 'classes/general/API.php',
