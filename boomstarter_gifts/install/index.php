@@ -118,7 +118,7 @@ Class boomstarter_gifts extends CModule
 
     public static function renderButton($product_id, $button_class='boomstarter-gift')
     {
-        require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/'.self::MODULE_ID.'/classes/general/CMSBitrix.php');
+        require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter.gifts/classes/general/CMSBitrix.php');
         echo \Boomstarter\Gifts\CMSBitrix::getInstance()->getButton($product_id, $button_class);
     }
 }

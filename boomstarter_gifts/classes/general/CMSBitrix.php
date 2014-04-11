@@ -221,6 +221,10 @@ class CMSBitrix extends CMS
                 </a>
             </span>";
 
+        if (LANG_CHARSET != 'UTF-8') {
+            $html = iconv('UTF-8', LANG_CHARSET, $html);
+        }
+
         return $html;
     }
 
