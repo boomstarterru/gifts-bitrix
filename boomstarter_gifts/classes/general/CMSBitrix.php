@@ -52,7 +52,8 @@ class CMSBitrix extends CMS
 
     public function getProductPrice($product)
     {
-        return (float)\CPrice::GetBasePrice($product['ID'])['PRICE'];
+        $price = \CPrice::GetBasePrice($product['ID']);
+        return floatval($price['PRICE']);
         //return $product['PROPERTIES']['PRICE']['VALUE'];
     }
 

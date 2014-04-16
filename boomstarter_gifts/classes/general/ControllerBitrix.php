@@ -2,8 +2,8 @@
 
 namespace Boomstarter\Gifts;
 
-require_once('Controller.php');
-require_once('CMSBitrix.php');
+require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter.gifts/classes/general/Controller.php');
+require_once($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter.gifts/classes/general/CMSBitrix.php');
 IncludeModuleLangFile($_SERVER['DOCUMENT_ROOT'].BX_ROOT.'/modules/boomstarter.gifts/classes/general/ControllerBitrix.php', 'ru.'.LANG_CHARSET);
 
 use Boomstarter\Gift;
